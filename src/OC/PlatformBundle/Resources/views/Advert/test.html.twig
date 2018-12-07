@@ -1,0 +1,25 @@
+{# src/OC/PlatformBundle/Resources/views/Advert/test.html.twig #}
+
+{% extends "OCPlatformBundle::layout.html.twig" %}
+
+{% block title %}
+  Page de Test - {{ parent() }}
+{% endblock %}
+
+{% block ocplatform_body %}
+
+  <h2>Je fais des tests</h2>
+  <p>
+  
+    {% for advert in test %}
+      {{advert.author}} a écrit l'annonce {{advert.title}} qui a l'id {{advert.id}} en racontant :<br>
+      {{advert.content}}<br><br>
+    {% endfor %}
+  <p>
+  
+
+
+
+    
+
+{% endblock %}
