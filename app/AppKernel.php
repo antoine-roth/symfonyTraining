@@ -19,6 +19,7 @@ class AppKernel extends Kernel
             new OC\PlatformBundle\OCPlatformBundle(),
             // Il faut enregistrer notre nouveau bundle :
             new OC\CoreBundle\OCCoreBundle(),
+            new Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'), true)) {
