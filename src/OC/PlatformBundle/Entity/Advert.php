@@ -293,7 +293,7 @@ class Advert
      *
      * @return Advert
      */
-    public function setNbApplications($nbApplications)
+    public function setNbApplications($nbApplications = 0)
     {
         $this->nbApplications = $nbApplications;
 

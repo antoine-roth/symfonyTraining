@@ -5,6 +5,7 @@
 namespace OC\PlatformBundle\Controller;
 
 use OC\PlatformBundle\Entity\Advert;
+use OC\PlatformBundle\Entity\Skill;
 use OC\PlatformBundle\Entity\AdvertSkill;
 use OC\PlatformBundle\Entity\Application;
 use OC\PlatformBundle\Entity\Image;
@@ -14,26 +15,45 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class AdvertController extends Controller
 {
-  public function indexAction($page)
+
+    public function indexAction($page)
   {
     if ($page < 1) {
-      throw new NotFoundHttpException('Page "'.$page.'" inexistante.');
+      throw $this->createNotFoundException("La page ".$page." n'existe pas.");
     }
-    
-    $em = $this->getDoctrine()->getManager();
-    // Notre liste d'annonce en dur
-    $listAdverts = $em->getRepository('OCPlatformBundle:Advert')->findAll();
+    // Ici je fixe le nombre d'annonces par page à 3
+    // Mais bien sûr il faudrait utiliser un paramètre, et y accéder via $this->container->getParameter('nb_per_page')
 
+    
+    $nbPerPage = 3;
+
+    // On récupère notre objet Paginator
+    $listAdverts = $this->getDoctrine()
+      ->getManager()
+      ->getRepository('OCPlatformBundle:Advert')
+      ->getAdverts($page, $nbPerPage)
+    ;
+
+    // On calcule le nombre total de pages grâce au count($listAdverts) qui retourne le nombre total d'annonces
+    $nbPages = ceil(count($listAdverts) / $nbPerPage);
+
+    // Si la page n'existe pas, on retourne une 404
+    if ($page > $nbPages) {
+      throw $this->createNotFoundException("La page ".$page." n'existe pas.");
+    }
+
+    // On donne toutes les informations nécessaires à la vue
     return $this->render('OCPlatformBundle:Advert:index.html.twig', array(
       'listAdverts' => $listAdverts,
+      'nbPages'     => $nbPages,
+      'page'        => $page,
     ));
   }
-
   public function viewAction($id)
   {
     $em = $this->getDoctrine()->getManager();
 
-    // On récupère l'annonce $id
+    // Pour récupérer une seule annonce, on utilise la méthode find($id)
     $advert = $em->getRepository('OCPlatformBundle:Advert')->find($id);
 
     // $advert est donc une instance de OC\PlatformBundle\Entity\Advert
@@ -42,13 +62,13 @@ class AdvertController extends Controller
       throw new NotFoundHttpException("L'annonce d'id ".$id." n'existe pas.");
     }
 
-    // On avait déjà récupéré la liste des candidatures
+    // Récupération de la liste des candidatures de l'annonce
     $listApplications = $em
       ->getRepository('OCPlatformBundle:Application')
       ->findBy(array('advert' => $advert))
     ;
 
-    // On récupère maintenant la liste des AdvertSkill
+    // Récupération des AdvertSkill de l'annonce
     $listAdvertSkills = $em
       ->getRepository('OCPlatformBundle:AdvertSkill')
       ->findBy(array('advert' => $advert))
@@ -146,10 +166,47 @@ class AdvertController extends Controller
 
     $em=$this->getDoctrine()->getManager();
 
+    $adverts = $em->getRepository('OCPlatformBundle:Advert')->findAll();
+    $categories = $em->getRepository('OCPlatformBundle:Category')->findAll();
+    $skills = $em->getRepository('OCPlatformBundle:Skill')->findAll();
+    $levels = array("noob","beginner","pro","expert","ultimate boss");
+
+    foreach ($adverts as $advert) {
+
+      $image = new Image();
+      $image->setUrl('http://sdz-upload.s3.amazonaws.com/prod/upload/job-de-reve.jpg');
+      $image->setAlt('Job de rêve');
+      $advert->setImage($image);
+    
+      foreach ($skills as $skill){
+
+        $advertSkill = new AdvertSkill();
+        $advertSkill->setSkill($skill);
+        $advertSkill->setAdvert($advert);
+        $advertSkill->setLevel($levels[rand(0,4)]);
+
+        $em->persist($advertSkill);
+      }
+    
+      $advert->addCategory($categories[rand(0,5)]);
+      if(rand(0,1)){
+        $application = new Application();
+        $application->setAuthor('zboob');
+        $application->setContent('je veux postuler pour le poste proposé dans l\'annonce : ');
+        $application->setAdvert($advert);
+        $em->persist($application);
+        
+        $advert->addApplication($application);
+      }
+    }
+
+
+
+
+    $em->flush();
+
 
     $test=$this->getDoctrine()->getManager()->getRepository('OCPlatformBundle:Advert')->myFindAllAbove(25);
-
-
     return $this->render('OCPlatformBundle:Advert:test.html.twig',array('test' => $test));
 
   }

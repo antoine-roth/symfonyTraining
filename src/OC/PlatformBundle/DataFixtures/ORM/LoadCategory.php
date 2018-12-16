@@ -14,8 +14,8 @@ class LoadCategory implements FixtureInterface
   {
     // Liste des noms de catégorie à ajouter
     $names = array(
-      'Développement web',
-      'Diver',
+      'Divers',
+      'Développement web', 
       'Développement mobile',
       'Graphisme',
       'Intégration',
