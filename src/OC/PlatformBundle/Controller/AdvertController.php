@@ -4,6 +4,7 @@
 
 namespace OC\PlatformBundle\Controller;
 
+use Symfony\Component\HttpFoundation\Response;
 use OC\PlatformBundle\Entity\Advert;
 use OC\PlatformBundle\Entity\Skill;
 use OC\PlatformBundle\Entity\AdvertSkill;
@@ -206,10 +207,54 @@ class AdvertController extends Controller
     $em->flush();
 
 
-    $test=$this->getDoctrine()->getManager()->getRepository('OCPlatformBundle:Advert')->myFindAllAbove(25);
+    $test=$em->getRepository('OCPlatformBundle:Advert')->myFindAllAbove(25);
     return $this->render('OCPlatformBundle:Advert:test.html.twig',array('test' => $test));
 
   }
 
+
+  public function purgeAction($days){
+    
+    $em=$this->getDoctrine()->getManager();
+    $purge = $this->container->get('oc_platform.purger.advert');
+    
+    $advert = $em->getRepository('OCPlatformBundle:Advert')->find(75);
+    
+    /*
+
+    $advertskills = $em->getRepository('OCPlatformBundle:AdvertSkill')->findBy(
+      array('advert'=> $advert)
+    );
+    
+    foreach ($advertskills as $advertskill){
+      $em->remove($advertskill);
+    }
+
+
+    $em->remove($advert);
+    $em->flush();
+    */
+    $date = date_create(date("Y-m-d H:i:s"));
+    $dateTest = date_create('2018-12-10');
+
+    $intervalLimite=date_interval_create_from_date_string(strval($days).' days');
+    $interval=date_diff($date,$dateTest);
+    
+    if(intval($interval->format('%d'))<intval($intervalLimite->format('%d'))){
+      echo('on ne supprime pas, interval : '.$interval->format('%d days').' interval limite : '.$intervalLimite->format('%d days'));
+    }
+    else{
+      echo('on supprime, interval : '.$interval->format('%d days').' interval limite : '.$intervalLimite->format('%d days'));
+    }
+    
+    
+
+      return new Response(" ");
+
+    
+    
+    //$purge->purgeAll();
+
+  }
 
 }

@@ -3,30 +3,41 @@
 
 namespace OC\PlatformBundle\PurgeAdvert;
 
+use Doctrine\ORM\EntityManager;
 use OC\PlatformBundle\Entity\Advert;
 use OC\PlatformBundle\Entity\Application;
 
 class OCPurgeAdvert
 {
-  private $mailer;
-  private $locale;
-  private $minLength;
+    /**
+    *
+    * @var EntityManager 
+    */
+   protected $em;
 
-  public function __construct(\Swift_Mailer $mailer, $locale, $minLength)
-  {
-    $this->mailer    = $mailer;
-    $this->locale    = $locale;
-    $this->minLength = (int) $minLength;
-  }
+   public function __construct(EntityManager $entityManager)
+   {
+    $this->em = $entityManager;
+   }
+
 
   /**
-   * Vérifie si le texte est un spam ou non
+   * Vérifie si une annonce a des applications ou pas
    *
-   * @param string $text
+   * @param Advert $advert
    * @return bool
    */
-  public function isSpam($text)
+  public function hasApplication(Advert $advert)
   {
-    return strlen($text) < $this->minLength;
+    return $advert->getNbApplications()>0;
   }
+
+  public function purge($days){
+
+
+
+  }
+
+
+
 }

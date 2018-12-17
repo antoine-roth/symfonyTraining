@@ -38,3 +38,10 @@ test_page:
     path:   /test
     defaults:
         _controller: OCPlatformBundle:Advert:test
+purge_page:
+    path:   /purge/{days}
+    defaults:
+        _controller: OCPlatformBundle:Advert:purge
+        days:    1
+    requirements:
+        page:   \d*
