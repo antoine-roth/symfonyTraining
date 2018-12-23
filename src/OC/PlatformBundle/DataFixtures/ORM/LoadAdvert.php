@@ -3,6 +3,7 @@
 
 namespace OC\PlatformBundle\DataFixtures\ORM;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use OC\PlatformBundle\Entity\AdvertSkill;
@@ -66,7 +67,13 @@ class LoadAdvert implements FixtureInterface
       $adv->setTitle($advert->title);
       $adv->setAuthor($advert->author);
       $adv->setContent($advert->content);
-      /*
+
+      $int= rand(time()-60*60*24*30,time());
+      $string = date("Y-m-d H:i:s",$int);
+      $date=date_create($string);
+      $adv->setDate($date);
+
+      /* ne marche pas?
       $image = new Image();
       $image->setUrl('http://sdz-upload.s3.amazonaws.com/prod/upload/job-de-reve.jpg');
       $image->setAlt('Job de rêve');

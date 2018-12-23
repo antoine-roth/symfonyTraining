@@ -173,12 +173,13 @@ class AdvertController extends Controller
     $levels = array("noob","beginner","pro","expert","ultimate boss");
 
     foreach ($adverts as $advert) {
-
+      
       $image = new Image();
       $image->setUrl('http://sdz-upload.s3.amazonaws.com/prod/upload/job-de-reve.jpg');
       $image->setAlt('Job de rêve');
       $advert->setImage($image);
-    
+      
+      
       foreach ($skills as $skill){
 
         $advertSkill = new AdvertSkill();
@@ -188,6 +189,7 @@ class AdvertController extends Controller
 
         $em->persist($advertSkill);
       }
+      
     
       $advert->addCategory($categories[rand(0,5)]);
       if(rand(0,1)){
@@ -221,7 +223,6 @@ class AdvertController extends Controller
     $listePurge = $purge->purge($days);
 
     return $this->render('OCPlatformBundle:Advert:purge.html.twig', array(
-      // Tout l'intérêt est ici : le contrôleur passe les variables nécessaires au template !
       'listePurge' => $listePurge
     ));
   }

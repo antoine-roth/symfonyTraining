@@ -32,11 +32,14 @@ class OCPurgeAdvert
     $advertskills = $this->em->getRepository('OCPlatformBundle:AdvertSkill')->findBy(
       array('advert'=> $advert)
     );
-    
+    //on supprime l'image associée si elle existe
+    $image = $advert->getImage();
+    if(!($image==NULL))$this->em->remove($image);
+    //on supprime les skills associés
     foreach ($advertskills as $advertskill){
       $this->em->remove($advertskill);
     }
-
+    //les catégories associées sont automatiquement supprimées
     $this->em->remove($advert);
     $this->em->flush();
   }
@@ -51,22 +54,21 @@ class OCPurgeAdvert
     
     foreach ($adverts as $advert){
 
-      if($this->hasApplication($advert)){}
-      else{
+      if( $this->hasApplication($advert) ){//on ne fait rien
+      }
+      else{//on check la date
         $dateTest = $advert->getDate();
         $interval=date_diff($date,$dateTest);
         
-        if(intval($interval->format('%d'))>intval($intervalLimite->format('%d'))){
+        if( intval($interval->format('%d')) > intval($intervalLimite->format('%d')) ){
           
           $deletedAdverts[]=$advert->getTitle();
           $this->deleteAdvert($advert);
         }
       }
 
-
-
     }
-    $endText = "les annonces suivantes ont été supprimées : ";
+    $endText = "Les annonces suivantes ont été supprimées : ";
     if(sizeof($deletedAdverts)>0){
       foreach ($deletedAdverts as $deletedAdvert){
         $endText= $endText.$deletedAdvert.", ";
@@ -75,7 +77,7 @@ class OCPurgeAdvert
       return $endText;
 
     }
-    return "aucune annonce à supprimer";
+    return "Aucune annonce à supprimer";
     
   }
 
